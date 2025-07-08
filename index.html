@@ -651,8 +651,11 @@
 
                 // Dummy extracted message
                 const extractedMessage = document.getElementById('extractedMessage');
-                console.log(response)
-                extractedMessage.textContent = response.message;
+
+                const json = await response.json();  // konversi response ke JSON
+                const message = json.message;        // ambil field 'message'
+
+                extractedMessage.textContent = message;
 
                 showResult('decode');
 
