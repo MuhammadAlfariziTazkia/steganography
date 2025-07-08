@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberSteg - Advanced Steganography Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 35%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 20px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #00ffff, #0080ff, #8000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 5px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 30px;
+            background: transparent;
+            border: none;
+            color: #a0a0a0;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .tab:hover::before {
+            left: 100%;
+        }
+
+        .tab.active {
+            background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(128, 0, 255, 0.2));
+            color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #00ffff;
+            font-size: 1.1rem;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-display {
+            display: block;
+            padding: 15px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px dashed rgba(0, 255, 255, 0.5);
+            border-radius: 10px;
+            text-align: center;
+            color: #a0a0a0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-input-display:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .select-field {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .select-field:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .algorithm-description {
+            background: rgba(0, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #00ffff;
+            margin-top: 10px;
+            color: #b0b0b0;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 255, 0, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .preview-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            margin: 15px 0;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, #00ff00, #00ff80);
+            color: #000;
+            margin-top: 15px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #00ffff;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 255, 255, 0.3);
+            border-top: 3px solid #00ffff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .message-result {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            word-wrap: break-word;
+        }
+
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>CyberSteg</h1>
+            <p>Advanced Steganography Tool - Hide in Plain Sight</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('encode')">🔒 ENCODE</button>
+            <button class="tab" onclick="switchTab('decode')">🔓 DECODE</button>
+        </div>
+
+        <!-- ENCODE TAB -->
+        <div id="encode" class="tab-content active">
+            <form id="encodeForm">
+                <div class="form-group">
+                    <label for="encodeImage">📁 Select Image (PNG only)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="encodeImage" class="file-input" accept=".png" required>
+                        <div class="file-input-display">
+                            <span id="encodeImageText">Click to select PNG image or drag & drop</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">💬 Secret Message</label>
+                    <textarea id="message" class="input-field" rows="4" placeholder="Enter your secret message..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="encodeAlgorithm">🔧 Algorithm</label>
+                    <select id="encodeAlgorithm" class="select-field" onchange="updateAlgorithmDescription('encode')">
+                        <option value="lsb">LSB (Least Significant Bit)</option>
+                    </select>
+                    <div id="encodeAlgorithmDesc" class="algorithm-description">
+                        LSB steganography replaces the least significant bits of pixel values with message bits. This method is simple, efficient, and provides good invisibility with minimal image distortion.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">🚀 ENCODE MESSAGE</button>
+            </form>
+
+            <div id="encodeLoading" class="loading">
+                <div class="spinner"></div>
+                <p>Processing your image...</p>
+            </div>
+
+            <div id="encodeError" class="error-message"></div>
+
+            <div id="encodeResult" class="result-section">
+                <h3>✅ Encoding Complete!</h3>
+                <img id="encodedImage" class="preview-image" alt="Encoded image">
+                <br>
+                <button id="downloadBtn" class="btn download-btn">📥 DOWNLOAD IMAGE</button>
+            </div>
+        </div>
+
+        <!-- DECODE TAB -->
+        <div id="decode" class="tab-content">
+            <form id="decodeForm">
+                <div class="form-group">
+                    <label for="decodeImage">📁 Select Encoded Image (PNG only)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="decodeImage" class="file-input" accept=".png" required>
+                        <div class="file-input-display">
+                            <span id="decodeImageText">Click to select PNG image or drag & drop</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="decodeAlgorithm">🔧 Algorithm</label>
+                    <select id="decodeAlgorithm" class="select-field" onchange="updateAlgorithmDescription('decode')">
+                        <option value="lsb">LSB (Least Significant Bit)</option>
+                    </select>
+                    <div id="decodeAlgorithmDesc" class="algorithm-description">
+                        LSB steganography replaces the least significant bits of pixel values with message bits. This method is simple, efficient, and provides good invisibility with minimal image distortion.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">🔍 DECODE MESSAGE</button>
+            </form>
+
+            <div id="decodeLoading" class="loading">
+                <div class="spinner"></div>
+                <p>Extracting hidden message...</p>
+            </div>
+
+            <div id="decodeError" class="error-message"></div>
+
+            <div id="decodeResult" class="result-section">
+                <h3>🔓 Decoded Message:</h3>
+                <div id="extractedMessage" class="message-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to selected tab
+            event.target.classList.add('active');
+        }
+
+        // Algorithm description update
+        function updateAlgorithmDescription(type) {
+            const select = document.getElementById(type + 'Algorithm');
+            const desc = document.getElementById(type + 'AlgorithmDesc');
+            
+            const descriptions = {
+                'lsb': 'LSB steganography replaces the least significant bits of pixel values with message bits. This method is simple, efficient, and provides good invisibility with minimal image distortion.'
+            };
+            
+            desc.textContent = descriptions[select.value];
+        }
+
+        // File input handling
+        function setupFileInput(inputId, textId) {
+            const input = document.getElementById(inputId);
+            const text = document.getElementById(textId);
+            
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.type !== 'image/png') {
+                        showError(inputId.includes('encode') ? 'encode' : 'decode', 'Please select a PNG image file only.');
+                        input.value = '';
+                        text.textContent = 'Click to select PNG image or drag & drop';
+                        return;
+                    }
+                    text.textContent = file.name;
+                    hideError(inputId.includes('encode') ? 'encode' : 'decode');
+                } else {
+                    text.textContent = 'Click to select PNG image or drag & drop';
+                }
+            });
+        }
+
+        // Error handling
+        function showError(type, message) {
+            const errorDiv = document.getElementById(type + 'Error');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        function hideError(type) {
+            const errorDiv = document.getElementById(type + 'Error');
+            errorDiv.classList.remove('show');
+        }
+
+        // Loading state
+        function showLoading(type) {
+            document.getElementById(type + 'Loading').classList.add('show');
+        }
+
+        function hideLoading(type) {
+            document.getElementById(type + 'Loading').classList.remove('show');
+        }
+
+        // Result display
+        function showResult(type) {
+            document.getElementById(type + 'Result').classList.add('show');
+        }
+
+        function hideResult(type) {
+            document.getElementById(type + 'Result').classList.remove('show');
+        }
+
+        // Encode form submission
+        document.getElementById('encodeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const image = document.getElementById('encodeImage').files[0];
+            const message = document.getElementById('message').value;
+            const algorithm = document.getElementById('encodeAlgorithm').value;
+            
+            if (!image || !message) {
+                showError('encode', 'Please select an image and enter a message.');
+                return;
+            }
+            
+            hideError('encode');
+            hideResult('encode');
+            showLoading('encode');
+            
+            try {
+                // Prepare FormData for API call
+                const formData = new FormData();
+                formData.append('image', image);
+                formData.append('message', message);
+                formData.append('algorithm', algorithm);
+                
+                // API call to encode endpoint
+                const response = await fetch('/api/encode', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Get the encoded image blob from response
+                const imageBlob = await response.blob();
+                
+                // Create object URL for preview and download
+                const imageUrl = URL.createObjectURL(imageBlob);
+                
+                hideLoading('encode');
+                
+                // Display the encoded image
+                const encodedImage = document.getElementById('encodedImage');
+                encodedImage.src = imageUrl;
+                
+                // Setup download functionality
+                document.getElementById('downloadBtn').onclick = function() {
+                    const link = document.createElement('a');
+                    link.download = 'encoded_image.png';
+                    link.href = imageUrl;
+                    link.click();
+                };
+                
+                showResult('encode');
+                
+            } catch (error) {
+                hideLoading('encode');
+                showError('encode', `Encoding failed: ${error.message}`);
+                console.error('Encode error:', error);
+            }
+        });
+
+        // Decode form submission
+        document.getElementById('decodeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const image = document.getElementById('decodeImage').files[0];
+            const algorithm = document.getElementById('decodeAlgorithm').value;
+            
+            if (!image) {
+                showError('decode', 'Please select an encoded image.');
+                return;
+            }
+            
+            hideError('decode');
+            hideResult('decode');
+            showLoading('decode');
+            
+            // Simulate API call with dummy response
+            setTimeout(() => {
+                hideLoading('decode');
+                
+                // Dummy extracted message
+                const extractedMessage = document.getElementById('extractedMessage');
+                extractedMessage.textContent = 'This is a dummy secret message extracted from the image. In real implementation, this would be the actual hidden message.';
+                
+                showResult('decode');
+            }, 2000);
+        });
+
+        // Initialize file inputs
+        setupFileInput('encodeImage', 'encodeImageText');
+        setupFileInput('decodeImage', 'decodeImageText');
+    </script>
+</body>
+</html>
