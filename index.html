@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -111,8 +112,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .form-group {
@@ -258,8 +266,15 @@
         }
 
         @keyframes slideIn {
-            from { transform: translateX(-100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         .preview-image {
@@ -298,8 +313,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .error-message {
@@ -333,7 +353,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
             background-size: 50px 50px;
@@ -342,12 +362,13 @@
         }
     </style>
 </head>
+
 <body>
     <div class="cyber-grid"></div>
-    
+
     <div class="container">
         <div class="header">
-            <h1>CyberSteg</h1>
+            <h1>Steganography by Alfarizi</h1>
             <p>Advanced Steganography Tool - Hide in Plain Sight</p>
         </div>
 
@@ -371,7 +392,8 @@
 
                 <div class="form-group">
                     <label for="message">💬 Secret Message</label>
-                    <textarea id="message" class="input-field" rows="4" placeholder="Enter your secret message..." required></textarea>
+                    <textarea id="message" class="input-field" rows="4" placeholder="Enter your secret message..."
+                        required></textarea>
                 </div>
 
                 <div class="form-group">
@@ -380,7 +402,8 @@
                         <option value="lsb">LSB (Least Significant Bit)</option>
                     </select>
                     <div id="encodeAlgorithmDesc" class="algorithm-description">
-                        LSB steganography replaces the least significant bits of pixel values with message bits. This method is simple, efficient, and provides good invisibility with minimal image distortion.
+                        LSB steganography replaces the least significant bits of pixel values with message bits. This
+                        method is simple, efficient, and provides good invisibility with minimal image distortion.
                     </div>
                 </div>
 
@@ -421,7 +444,8 @@
                         <option value="lsb">LSB (Least Significant Bit)</option>
                     </select>
                     <div id="decodeAlgorithmDesc" class="algorithm-description">
-                        LSB steganography replaces the least significant bits of pixel values with message bits. This method is simple, efficient, and provides good invisibility with minimal image distortion.
+                        LSB steganography replaces the least significant bits of pixel values with message bits. This
+                        method is simple, efficient, and provides good invisibility with minimal image distortion.
                     </div>
                 </div>
 
@@ -449,15 +473,15 @@
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
-            
+
             // Remove active class from all tabs
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            
+
             // Show selected tab content
             document.getElementById(tabName).classList.add('active');
-            
+
             // Add active class to selected tab
             event.target.classList.add('active');
         }
@@ -466,11 +490,11 @@
         function updateAlgorithmDescription(type) {
             const select = document.getElementById(type + 'Algorithm');
             const desc = document.getElementById(type + 'AlgorithmDesc');
-            
+
             const descriptions = {
                 'lsb': 'LSB steganography replaces the least significant bits of pixel values with message bits. This method is simple, efficient, and provides good invisibility with minimal image distortion.'
             };
-            
+
             desc.textContent = descriptions[select.value];
         }
 
@@ -478,8 +502,8 @@
         function setupFileInput(inputId, textId) {
             const input = document.getElementById(inputId);
             const text = document.getElementById(textId);
-            
-            input.addEventListener('change', function(e) {
+
+            input.addEventListener('change', function (e) {
                 const file = e.target.files[0];
                 if (file) {
                     if (file.type !== 'image/png') {
@@ -527,61 +551,61 @@
         }
 
         // Encode form submission
-        document.getElementById('encodeForm').addEventListener('submit', async function(e) {
+        document.getElementById('encodeForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
+
             const image = document.getElementById('encodeImage').files[0];
             const message = document.getElementById('message').value;
             const algorithm = document.getElementById('encodeAlgorithm').value;
-            
+
             if (!image || !message) {
                 showError('encode', 'Please select an image and enter a message.');
                 return;
             }
-            
+
             hideError('encode');
             hideResult('encode');
             showLoading('encode');
-            
+
             try {
                 // Prepare FormData for API call
                 const formData = new FormData();
                 formData.append('image', image);
                 formData.append('message', message);
                 formData.append('algorithm', algorithm);
-                
+
                 // API call to encode endpoint
-                const response = await fetch('/api/encode', {
+                const response = await fetch('https://steganografi.onrender.com/api/encode', {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
+
                 // Get the encoded image blob from response
                 const imageBlob = await response.blob();
-                
+
                 // Create object URL for preview and download
                 const imageUrl = URL.createObjectURL(imageBlob);
-                
+
                 hideLoading('encode');
-                
+
                 // Display the encoded image
                 const encodedImage = document.getElementById('encodedImage');
                 encodedImage.src = imageUrl;
-                
+
                 // Setup download functionality
-                document.getElementById('downloadBtn').onclick = function() {
+                document.getElementById('downloadBtn').onclick = function () {
                     const link = document.createElement('a');
                     link.download = 'encoded_image.png';
                     link.href = imageUrl;
                     link.click();
                 };
-                
+
                 showResult('encode');
-                
+
             } catch (error) {
                 hideLoading('encode');
                 showError('encode', `Encoding failed: ${error.message}`);
@@ -590,31 +614,53 @@
         });
 
         // Decode form submission
-        document.getElementById('decodeForm').addEventListener('submit', async function(e) {
+        document.getElementById('decodeForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
+
             const image = document.getElementById('decodeImage').files[0];
             const algorithm = document.getElementById('decodeAlgorithm').value;
-            
+
             if (!image) {
                 showError('decode', 'Please select an encoded image.');
                 return;
             }
-            
+
             hideError('decode');
             hideResult('decode');
             showLoading('decode');
-            
+
             // Simulate API call with dummy response
-            setTimeout(() => {
+
+            try {
+                // Prepare FormData for API call
+                const formData = new FormData();
+                formData.append('image', image);
+                formData.append('algorithm', algorithm);
+
+                // API call to encode endpoint
+                const response = await fetch('https://steganografi.onrender.com/api/decode', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 hideLoading('decode');
-                
+
                 // Dummy extracted message
                 const extractedMessage = document.getElementById('extractedMessage');
-                extractedMessage.textContent = 'This is a dummy secret message extracted from the image. In real implementation, this would be the actual hidden message.';
-                
+                extractedMessage.textContent = response;
+
                 showResult('decode');
-            }, 2000);
+
+
+            } catch (error) {
+                hideLoading('decode');
+                showError('decode', `Decoding failed: ${error.message}`);
+                console.error('Decode error:', error);
+            }
         });
 
         // Initialize file inputs
@@ -622,4 +668,5 @@
         setupFileInput('decodeImage', 'decodeImageText');
     </script>
 </body>
+
 </html>
